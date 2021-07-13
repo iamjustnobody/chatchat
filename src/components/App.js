@@ -27,7 +27,9 @@ export const App=()=> {
   },[authUser,authResolved])
 
 
-// so when first loading /login page, auth use undefined->undefined false -> auth use null -> null false -> null true
+// so when first loading /login page, auth use undefined->undefined false 
+//-> auth use null -> null false -> null true
+//->auth user (actual user xxx) -> (actual user xxx) true
 useEffect(()=>{
   if(authResolved){
     history.push(!!authUser?'/':'/login');

@@ -3,15 +3,56 @@ import { validationSchema,defaultValues } from "./registryFormikConfig" //or 'co
 import { FormField } from "../components/FormField" //'.FormField' or 'components/FormField'
 import { useHistory } from "react-router"
 import { useState } from "react"
+import {fb} from 'service/firebase'
 
 export const Signup=()=> {
 
   const history=useHistory();
   const [serverError,setServerError]=useState('');
 
-  const signup=({email,userName,password},{setSubmitting})=>console.log('SIgning up: ',email,userName,password);
+  //const signup=({email,userName,password},{setSubmitting})=>console.log('SIgning up: ',email,userName,password);
   //const signup=(values,setSubmitting)=>console.log('SIgning up: ',values);
   //both ok
+
+  const signup=({email,userName,password},{setSubmitting})=>{
+    fb.auth.createUserWithEmailAndPassword(email,password)
+    .then(res=>{
+      if(res?.user?.uid){
+        fetch('/api/createUser',{
+          method:'POST',
+          headers:{
+            'Content-Type':'application/json'
+          },
+          body:JSON.stringify({ //for req.body in api/createUser.js
+            userName,
+            userId:res.user.uid
+          })
+        })
+        .then((apiResData)=>{ //apiRes.data returned from createUser.js
+          fb.firestore.collection('chatUsers').doc(res.user.uid).set({userName,avatar:''})
+        })
+
+      }
+      //from fb.auth to chatengine to firesotre
+      else { //if res.user.uid not exist -> something went terrifically wrong
+        setServerError('having trouble sigining you up, pls try it again later')
+      }
+
+
+    }) //already handle redirect pages in app.js on auth change
+    .catch(err=>{ //if createwithusername&pwd not working, catch err here
+      if(err.code==='auth/email-already-in-use'){
+        setServerError('Account with this email already exists')
+      }else{
+        setServerError('SOmething went wrong')
+      }
+    })
+    .finally(()=>setSubmitting(false))
+
+
+  }
+  
+
 
   
     return (
