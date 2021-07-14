@@ -1,4 +1,4 @@
-import { createContext,useState } from 'react'; //'istanbul-lib-report'
+import { createContext,useContext,useEffect,useState } from 'react'; //'istanbul-lib-report'
 import {fb} from 'service/firebase'
 import {deleteChat, getMessages, leaveChat, newChat} from 'react-chat-engine'
 
@@ -37,6 +37,22 @@ export const ChatProvider = ({children,authUser})=>{
 
 
     //to setChatConfig once authuser has initialised
+    useEffect(()=>{
+        if(authUser){
+            fb.firestore
+            .collection('chatUsers')
+            .doc(authUser.uid)
+            .onSnapshot(snap=>{
+                setChatConfig({
+                    userSecret:authUser.uid,
+                    avatar:snap.data().avatar,
+                    userName:snap.data().userName,
+                    projectID:'82eb0471-3c38-4528-a1d2-019da3000493',
+                })
+            })
+        }
+    })
+
 
     return (
         <ChatContext.Provider 
@@ -44,7 +60,7 @@ export const ChatProvider = ({children,authUser})=>{
                 {
                     myChats,setMyChats,
                     chatConfig,setChatConfig,
-                    selectChat,setSelectedChat,
+                    selectedChat,setSelectedChat,
                     selectChat,createChat,removeChat,
                 }
             }> 
@@ -54,3 +70,19 @@ export const ChatProvider = ({children,authUser})=>{
 }
 
 //all of states & funcs shared with children 
+
+export const useChat=()=>{
+    const {
+        myChats,setMyChats,
+        chatConfig,setChatConfig,
+        selectedChat,setSelectedChat,
+        selectChat,createChat,removeChat,
+    }=useContext(ChatContext);
+
+    return {
+        myChats,setMyChats,
+        chatConfig,setChatConfig,
+        selectedChat,setSelectedChat,
+        selectChat,createChat,removeChat,
+    } //return a single obj
+}

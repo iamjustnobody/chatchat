@@ -9,6 +9,9 @@ import { useAuth } from "hooks/useAuth"
 import { useResolved } from "hooks/useResolved"
 import { useHistory } from "react-router-dom"
 
+import {useChat} from 'context/ChatContext'
+import { ChatProvider } from "context/ChatContext"
+
 export const App=()=> {
   const history=useHistory();
 
@@ -45,6 +48,7 @@ useEffect(()=>{
   },[])*/ //for initial test
 
 
+/*
   return (
     <div className='app'>
       <Switch>
@@ -54,7 +58,21 @@ useEffect(()=>{
         <Route path='/' component={Login}></Route>
       </Switch>
     </div>
-  )
+  )*/
+
+  return authResolved?(
+    <ChatProvider authUser={authUser}>
+      <div className='app'>
+        <Switch>
+          <Route exact path='/' component={Chat}></Route>
+          <Route path='/login' component={Login}></Route>
+          <Route path='/signup' component={Signup}></Route>
+          <Route path='/' component={Login}></Route>
+        </Switch>
+      </div>
+    </ChatProvider>
+  ):(<>Loading...</>)
+
 }
 
 
