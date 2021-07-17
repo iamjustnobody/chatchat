@@ -12,6 +12,8 @@ import { useHistory } from "react-router-dom"
 import {useChat} from 'context/ChatContext'
 import { ChatProvider } from "context/ChatContext"
 
+import 'semantic-ui-css/semantic.min.css'
+
 export const App=()=> {
   const history=useHistory();
 

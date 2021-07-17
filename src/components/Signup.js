@@ -29,6 +29,7 @@ export const Signup=()=> {
           })
         })
         .then((apiResData)=>{ //apiRes.data returned from createUser.js
+          console.log('apiResData',apiResData)
           fb.firestore.collection('chatUsers').doc(res.user.uid).set({userName,avatar:''})
         })
 
