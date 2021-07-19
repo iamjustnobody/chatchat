@@ -6,6 +6,7 @@ export const useAuth=()=>{
 
     useEffect(()=>{
         const unsubscribe=fb.auth.onAuthStateChanged(user=>{
+            console.log('user on fb authchange ',user)
             if(user){ //if there's an user obj -> we are logged in
                 setAuthUser(user)
             }else{

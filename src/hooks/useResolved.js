@@ -8,5 +8,6 @@ export const useResolved = (...vals) =>{
         setResolved(vals.every(v=>v!==undefined))
     },[vals,setResolved]) //?setResolved
 
+    console.log('resolved?',resolved)
     return resolved; //true if resolved otherwise false
 }

@@ -25,7 +25,9 @@ export const App=()=> {
     console.log('auth user', authUser)
   },[authUser])
 
+  console.log('b4 authrosolved')
   const authResolved =useResolved(authUser)
+  console.log('after authrosolved')
 
   useEffect(()=>{
     console.log(authUser,authResolved)

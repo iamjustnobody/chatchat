@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useChat } from "context/ChatContext"; //or '../context/ChatContext' 
 import { ChatEngine, ChatEngineWrapper, getChats, Socket } from "react-chat-engine";
 import { ChatApp } from "./ChatApp";
+import { ChatToolbar } from "./ChatToolbar";
 
 export const Chat=()=> {
 
@@ -58,7 +59,7 @@ return (
 
     return (
       <div style={{height:'100%',width:'100%',display:'flex'}}>
-        {chatConfig==undefined?'undefined':'defined'}
+        
         {!!chatConfig && 
         <ChatEngineWrapper>
           
@@ -66,11 +67,10 @@ return (
           userName={chatConfig.userName}
           projectID={chatConfig.projectID} 
           userSecret={chatConfig.userSecret} 
-          onConnect={()=>{getChats(chatConfig,async (chats)=>{
-            console.log('hi',chats,myChats);
-            await setMyChats(chats)
-          }
-          )}}
+          onConnect={()=>{
+            //getChats(chatConfig,async (chats)=>{console.log('hi',chats,myChats);await setMyChats(chats)})
+            getChats(chatConfig,setMyChats)
+          }}
         
           />
         
@@ -79,7 +79,7 @@ return (
           <ChatApp />
           <div className='current-chat'>
             {
-            selectedChat?<></>
+            selectedChat?<div className='chat'><ChatToolbar /></div>
             :<div className='no-chat-selected'>
               <img src="/img/social media.png" className="start-a-conversation" alt="start a conversation" />
               Select a Chat
@@ -108,9 +108,9 @@ return (
           userName={chatConfig.userName}
           projectID={chatConfig.projectID} 
           userSecret={chatConfig.userSecret} 
-          onConnect={()=>{getChats(chatConfig,(chats)=>{
-            console.log('hihi');setMyChats(chats);
-            console.log(myChats);}
+          onConnect={()=>{getChats(chatConfig,async (chats)=>{
+            console.log('hihi');await setMyChats(chats);
+            console.log(myChats,chats);}
           )}
         }
           />)

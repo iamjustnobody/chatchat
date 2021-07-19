@@ -5,7 +5,7 @@ import { ChatList } from './ChatList'
 
 export const ChatApp=()=>{
 
-    const {myChats,createChat,chatConfig}=useChat()
+    const {myChats,createChat,chatConfig,createChat_f}=useChat()
     console.log('chatapp',myChats,chatConfig)
     const chatResolved=useResolved(myChats)
 
@@ -19,7 +19,7 @@ export const ChatApp=()=>{
                     <h3>No Chats Yet</h3>
                 </div>}
 
-                <button className='create-chat-button' onClick={createChat}>
+                <button className='create-chat-button' onClick={createChat_f}>
                     Create A Chat
                 </button>
             </>
@@ -30,3 +30,4 @@ export const ChatApp=()=>{
         )}
     </div>
 }
+//<button className='create-chat-button' onClick={createChat}>Create A Chat</button>

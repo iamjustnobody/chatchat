@@ -7,6 +7,8 @@ export const ChatContext=createContext();
 
 export const ChatProvider = ({children,authUser})=>{
 
+    console.log('provider ',authUser)
+
     const [myChats,setMyChats]=useState();
     const [chatConfig,setChatConfig]=useState();
     const [selectedChat,setSelectedChat]=useState();
@@ -15,15 +17,30 @@ export const ChatProvider = ({children,authUser})=>{
     const createChat = () =>{
         newChat(chatConfig,{title:''});
     }
+    const createChat_f = () =>{
+        newChat(chatConfig,{title:''},(chatData)=>{
+            if(chatData.admin.username===chatConfig.userName) selectChat(chatData)
+            setMyChats([...myChats,chatData].sort((a,b)=>a.id-b.id))
+        });
+    }
 
     const removeChat = chat => {
         const isAdmin = chat.admin.username === chatConfig.userName;
         if(isAdmin&&window.confirm('Are you sure you wanna delete this chat as an admin')){
-            deleteChat(chatConfig,chat.id);
+            //deleteChat(chatConfig,chat.id,data=>console.log(data));
+            deleteChat(chatConfig,chat.id,removeChatHelper)
         }else if (window.confirm('Are you sure you wanna leave this chat')){
-            leaveChat(chatConfig,chat.id,(data)=>{console.log(data)}) 
+            //leaveChat(chatConfig,chat.id,chatConfig.userName);
+            //leaveChat(chatConfig,chat.id,(data)=>{console.log(data)}) 
             //data.person.username/avatar==chatConfig.userName/avatar
+
+            leaveChat(chatConfig,chat.id,removeChatHelper)
         }
+    }
+
+    const removeChatHelper=(chatData)=>{
+        if(selectedChat?.id===chatData.id) setSelectedChat(null)
+        setMyChats(myChats.filter(_myc=>_myc.id!==chatData.id).sort((a,b)=>a.id-b.id))
     }
 
     const selectChat = chat => {
@@ -43,9 +60,9 @@ export const ChatProvider = ({children,authUser})=>{
             fb.firestore
             .collection('chatUsers')
             .doc(authUser.uid)
-            .onSnapshot(snap=>{
+            .onSnapshot(snap=>{//.get().then(snap=>{
                 console.log('snapdata ',snap.data())
-                if(snap.data()!=null&&snap.data()!=undefined){
+                if(snap.data()!=null&&snap.data()!=undefined){//snap.data()!=undefined -> snap.exists
                 setChatConfig({
                     userSecret:authUser.uid,
                     avatar:snap.data()?snap.data().avatar:undefined,//null ''
@@ -65,6 +82,7 @@ export const ChatProvider = ({children,authUser})=>{
                     chatConfig,setChatConfig,
                     selectedChat,setSelectedChat,
                     selectChat,createChat,removeChat,
+                    createChat_f,
                 }
             }> 
             {children}
@@ -80,6 +98,7 @@ export const useChat=()=>{
         chatConfig,setChatConfig,
         selectedChat,setSelectedChat,
         selectChat,createChat,removeChat,
+        createChat_f,
     }=useContext(ChatContext);
 
     return {
@@ -87,5 +106,6 @@ export const useChat=()=>{
         chatConfig,setChatConfig,
         selectedChat,setSelectedChat,
         selectChat,createChat,removeChat,
+        createChat_f,
     } //return a single obj
 }
