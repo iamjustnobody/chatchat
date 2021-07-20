@@ -28,7 +28,7 @@ export const SearchUsers=({ visible, closeFn })=>{
 
     const{myChats,setMyChats,chatConfig,selectedChat,setSelectedChat,}=useChat()
 
-    const selectUser=username=>{
+    const selectUser=username=>{ //front end select & add users to chats
         const filteredChats=myChats.filter(_myc=>_myc.id!==selectedChat.id)
         const updatedChat={...selectedChat,people:[...selectedChat.people,{person:{username}}]}
         setSelectedChat(updatedChat)
@@ -37,8 +37,10 @@ export const SearchUsers=({ visible, closeFn })=>{
         setSearchTerm('')
     }
 
-    useEffect(()=>{
-        if(searchTerm){//if(searchTerm){
+    const addUser=username=>addPerson(chatConfig,selectedChat.id,username,()=>selectUser(username))
+
+    useEffect(()=>{ //for getting search results from chatengine db
+        if(debounceSearchTerm){//if(searchTerm){
             setLoading(true)
             getOtherPeople(chatConfig,selectedChat.id,(chatId,data)=>{//console.log('getotherpeople ',data)
                 const usernames=Object.keys(data).map(_key=>data[_key].username)
@@ -53,20 +55,21 @@ export const SearchUsers=({ visible, closeFn })=>{
             setLoading(false); //opt
             ////closeFn()
         }
-    },[searchTerm,selectedChat,chatConfig]) //[searchTerm,selectedChat,chatConfig]
+    },[debounceSearchTerm,selectedChat,chatConfig]) //[searchTerm,selectedChat,chatConfig]
 
     useEffect(()=>{setSearchTerm('');setSearchResults(null);setLoading(false);closeFn()},[selectedChat,chatConfig])
     ////useEffect(()=>{setSearchResults(null);setLoading(false);closeFn()},[searchTerm])
     //useEffect(()=>{if(searchTerm===''){setSearchResults(null);setLoading(false);}},[searchTerm]) ////closeFn()
-    useEffect(()=>{if(searchTerm===''){console.log('empty',searchResults)}},[searchTerm])
-    useEffect(()=>{if(searchResults==null){console.log('huhhkjiji',searchTerm)}},[searchResults])
+    //for testing purpose
+    //useEffect(()=>{if(searchTerm===''){console.log('empty',searchResults)}},[searchTerm])
+    //useEffect(()=>{if(searchResults==null){console.log('huhhkjiji',searchTerm)}},[searchResults])
     
     return <div className='user-search' style={{display:visible?'block':'none'}}>
         <Search fluid onBlur={closeFn} loading={loading} value={searchTerm} placeholder='Search for users' 
                 open={!!searchResults&&!loading} onSearchChange={e=>setSearchTerm(e.target.value)} 
                 input={{ref:r=>{searchRef=r}}} results={searchResults}
                 onResultSelect={(e,data)=>{
-                    if(data.result?.title) selectUser(data.result.title)
+                    if(data.result?.title) addUser(data.result.title) //selectUser(data.result.title)
                 }}/>
     </div>
 }

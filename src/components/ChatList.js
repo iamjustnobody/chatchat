@@ -4,10 +4,12 @@ import { ChatApp } from "./ChatApp"
 import { notMe } from "helpers/notMe"
 import { joinUsernames } from "helpers/joinUsernames"
 import { ChatAvatar } from "./ChatAvatar"
+import { useEffect } from "react"
 
 
 export const ChatList=()=>{
-    const {myChats,chatConfig,selectedChat,selectChat,removeChat}=useChat()
+    const {myChats,chatConfig,selectedChat,selectChat,removeChat,removeChatHelper,removeChat_f}=useChat()
+    useEffect(()=>{console.log('selectedchat changed ',selectedChat)},[selectedChat])
 
     return (
         <div className='chat-list'>
@@ -57,3 +59,11 @@ export const ChatList=()=>{
         </div>
     )
 }
+//<div onClick={()=>removeChat_f(_mychat)} className='chat-item-delete'><Icon name='delete' /></div>
+//removeChat -> db chatengine io ; removeChatHelper -> front end diaplay/presentation -> onDelete in <Search>
+//removeChat_f -> both (above) combined
+//removeChat_f in div onclick + <Search ondelete={removechathelper}> = fe twice
+//removeChat in div onclick + <Search ondelete=rmhelper> or removeChat_f in div onclick + <Search> = fe once
+//removeChat/rmchat_f in div onclick + <Search ondelete=rmchat_f/rmchat> -> fe 0-2 times db error
+
+//onClick={()=>{console.log('select this chat',_mychat);selectChat(_mychat)}}

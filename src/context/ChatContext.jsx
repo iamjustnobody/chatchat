@@ -18,13 +18,31 @@ export const ChatProvider = ({children,authUser})=>{
         newChat(chatConfig,{title:''});
     }
     const createChat_f = () =>{
-        newChat(chatConfig,{title:''},(chatData)=>{
+        /*newChat(chatConfig,{title:''},(chatData)=>{
             if(chatData.admin.username===chatConfig.userName) selectChat(chatData)
             setMyChats([...myChats,chatData].sort((a,b)=>a.id-b.id))
-        });
+        });*/ //ok
+        newChat(chatConfig,{title:''},createChatHelper);//ok
+        //newChat(chatConfig,{title:''},(chatData)=>createChatHelper(chatData));//ok
+        //newChat(chatConfig,{title:''},(chatData)=>{createChatHelper(chatData)});//ok
+        //newChat(chatConfig,{title:''},(chatData)=>{createChatHelper(chatData);return});//ok or return; ok
+    }
+
+    const createChatHelper=(chatData)=>{
+        if(chatData.admin.username===chatConfig.userName) selectChat(chatData)
+        setMyChats([...myChats,chatData].sort((a,b)=>a.id-b.id))
     }
 
     const removeChat = chat => {
+        const isAdmin = chat.admin.username === chatConfig.userName;
+        if(isAdmin&&window.confirm('Are you sure you wanna delete this chat as an admin')){
+            deleteChat(chatConfig,chat.id);
+        }else if (window.confirm('Are you sure you wanna leave this chat')){
+            leaveChat(chatConfig,chat.id);
+        }
+    }
+
+    const removeChat_f = chat => {
         const isAdmin = chat.admin.username === chatConfig.userName;
         if(isAdmin&&window.confirm('Are you sure you wanna delete this chat as an admin')){
             //deleteChat(chatConfig,chat.id,data=>console.log(data));
@@ -44,7 +62,8 @@ export const ChatProvider = ({children,authUser})=>{
     }
 
     const selectChat = chat => {
-        getMessages(chatConfig,chat.id,messages=>{ //cb fn
+        getMessages(chatConfig,chat.id,(chatId,messages)=>{ //cb fn
+            console.log('getmessages ',messages)
             setSelectedChat({
                 ...chat,
                 messages,
@@ -82,7 +101,7 @@ export const ChatProvider = ({children,authUser})=>{
                     chatConfig,setChatConfig,
                     selectedChat,setSelectedChat,
                     selectChat,createChat,removeChat,
-                    createChat_f,
+                    createChat_f,createChatHelper,removeChatHelper,removeChat_f,
                 }
             }> 
             {children}
@@ -98,7 +117,7 @@ export const useChat=()=>{
         chatConfig,setChatConfig,
         selectedChat,setSelectedChat,
         selectChat,createChat,removeChat,
-        createChat_f,
+        createChat_f,createChatHelper,removeChatHelper,removeChat_f,
     }=useContext(ChatContext);
 
     return {
@@ -106,6 +125,6 @@ export const useChat=()=>{
         chatConfig,setChatConfig,
         selectedChat,setSelectedChat,
         selectChat,createChat,removeChat,
-        createChat_f,
+        createChat_f,createChatHelper,removeChatHelper,removeChat_f,
     } //return a single obj
 }

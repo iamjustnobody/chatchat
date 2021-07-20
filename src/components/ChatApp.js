@@ -19,7 +19,7 @@ export const ChatApp=()=>{
                     <h3>No Chats Yet</h3>
                 </div>}
 
-                <button className='create-chat-button' onClick={createChat_f}>
+                <button className='create-chat-button' onClick={createChat}>
                     Create A Chat
                 </button>
             </>
@@ -30,4 +30,9 @@ export const ChatApp=()=>{
         )}
     </div>
 }
-//<button className='create-chat-button' onClick={createChat}>Create A Chat</button>
+//<button className='create-chat-button' onClick={createChat_f}>Create A Chat</button>
+//more re-render; as <Search onNewChat> covers createChatHelper for frontend presentation;
+//createChat_f=createChat(chatengineio db)+createChatHelper (fe display)
+//button onClick={createChat_f} + <Search onNewChat createChatHelper> -> fe twice
+//button onClick={createChat} or <Search> -> fe once
+//button onClick={createChat_f/createChat} + <Search onNewChat createChat or createChat_f>->db twice & fe 1-2 times

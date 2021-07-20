@@ -3,6 +3,7 @@ import { useChat } from "context/ChatContext"; //or '../context/ChatContext'
 import { ChatEngine, ChatEngineWrapper, getChats, Socket } from "react-chat-engine";
 import { ChatApp } from "./ChatApp";
 import { ChatToolbar } from "./ChatToolbar";
+import { ChatInput4Msg } from "./ChatInput4Msg";
 
 export const Chat=()=> {
 
@@ -13,7 +14,8 @@ export const Chat=()=> {
 //-> object (chatConfig with userSecret projectId userName etc)
 //why [userChat] infinite? snapshot?
 
-const {myChats,setMyChats,chatConfig,selectedChat}=useChat();
+const {myChats,setMyChats,chatConfig,selectedChat,selectChat,
+  createChat_f,removeChat,setSelectedChat,removeChatHelper,createChatHelper}=useChat();
 /*useEffect(()=>{
   console.log('my chats:',myChats)
 },[myChats])
@@ -28,6 +30,20 @@ useEffect(()=>{
 },[chatConfig])*/
 
 console.log('chat',myChats,chatConfig)
+
+/*
+useEffect(()=>{console.log('whyyyyyyy')
+  getChats(chatConfig,(chats)=>{console.log('getChats hehhehehhehhhheheh ',chats)
+    setMyChats(chats);
+  })
+},[]) //why getchats is not working here at the start but works inside of <Search /> below
+//if changing getmessages in chatcontext then o/p 'whyyyyy' -----------'getchats hehehehhehhh'
+*/
+useEffect(()=>{console.log('whyyyyyyy')
+  getChats(chatConfig,(chats)=>{console.log('getChats hehhehehhehhhheheh ',chats)
+    //setMyChats(chats);
+  })
+},[myChats]) //o/p 'whyyyyy' -----------'getchats hehehehhehhh'
 
 /*
 return (
@@ -69,9 +85,22 @@ return (
           userSecret={chatConfig.userSecret} 
           onConnect={()=>{
             //getChats(chatConfig,async (chats)=>{console.log('hi',chats,myChats);await setMyChats(chats)})
-            getChats(chatConfig,setMyChats)
+            //getChats(chatConfig,setMyChats)//ok
+            getChats(chatConfig,(chats)=>{setMyChats(chats);console.log('getChats ',chats)})//ok
           }}
-        
+          onNewChat={createChatHelper} //not createChat or createChat_f
+          onDeleteChat={chat=>removeChatHelper(chat)} //not removeChat nor removeChat_f
+          onNewMessage={(chatId,newmessage)=>{console.log('chatId ',chatId,'newmsg ',newmessage)
+            if(selectedChat && selectedChat.id===chatId){
+              setSelectedChat({...selectedChat,messages:[...selectedChat.messages,newmessage]})
+            } //below for if & else
+            const filteredChats=myChats.filter(_chat=>_chat.id!==chatId)
+            const newMsgSelectedChat=myChats.find(_chat=>_chat.id===chatId) 
+            //const newMsgSelectedChat=myChats.filter(_chat=>_chat.id===chatId)[0]
+            //not necessarily const selectedChat or selectedChat.id
+            const updatedChat={...newMsgSelectedChat,last_message:newmessage}
+            setMyChats([...filteredChats,updatedChat].sort((a,b)=>a.id-b.id))
+          }}
           />
         
 
@@ -79,7 +108,11 @@ return (
           <ChatApp />
           <div className='current-chat'>
             {
-            selectedChat?<div className='chat'><ChatToolbar /></div>
+            selectedChat?
+            <div className='chat'>
+              <ChatToolbar />
+              <ChatInput4Msg />
+            </div>
             :<div className='no-chat-selected'>
               <img src="/img/social media.png" className="start-a-conversation" alt="start a conversation" />
               Select a Chat
